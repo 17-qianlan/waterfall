@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>浅蓝</title>
+        <style type="text/css">
+            *{
+                margin: 0;
+                padding: 0;
+            }
+            html,body{
+                width: 100%;
+                height: 100%;
+            }
+            #app{
+                position: relative;
+                width: 100%;
+            }
+            #app image{
+                float: left;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app"></div>
+        <script>
+            /*
+            * 实现瀑布流, 我可以控制高度或者宽度, 以每一行为单位
+            * 高度使用left, 宽度使用top
+            * 图片的自动补位, 可以使用判断来显示
+            * 窗口宽度可以使用onresize事件来判断, 决定要显示多少张图片, 如果宽度足够, 则按正常显示
+            * 如果宽度不足, 那么可以使用一张稍窄的图片来补位(也就是9:16那种)
+            * 在补位时, 可以先看一下此行显示几张图片, 使用一个随机来决定放在哪个位置, 那么这个肯定是要需要每一行有个父级标签的
+            *
+            * */
+            window.onload = () => {
+                let createDom = function(dom, obj , len, w, show, index){
+                    let width = w/show;
+                    let addW = 0;
+                    for (let i = 0; i < len; i++) {
+                        let cache = Math.floor(Math.random()*500);
+                        let h = cache > 99? cache : cache * 5;
+                        let newDom = document.createElement(dom);
+                        if (dom === 'img') {
+                            dom.src = `./images/${index}.jpg`;
+                        } else {
+                            newDom.classList.add('child');
+                            newDom.style.cssText = `position: absolute;left: ${addW}px;width: ${w}px;height: ${h}px;background: #eee;`
+                        }
+                        obj.appendChild(newDom);
+                        addW += w + 2;
+                        if (addW - width > )
+                    }
+                };
+                let app = document.getElementById("app");
+                let w = app.offsetWidth;
+                createDom('div', app, 100, w, 10);
+                this.onresize = () => {
+                    w = app.offsetWidth;
+                    createDom('div', app, 100, w);
+                }
+            }
+        </script>
+    </body>
+</html>
