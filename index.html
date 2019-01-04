@@ -34,32 +34,81 @@
             *
             * */
             window.onload = () => {
-                let createDom = function(dom, obj , len, w, show, index){
-                    let width = w/show;
+                const getScroll = () => {
+                    let div = document.createElement('div');
+                    div.style.cssText = 'width: 100px;height: 100px;overflow-x: scroll;overflow: scroll;'
+                    document.body.appendChild(div);
+                    let offsetW = div.offsetWidth;
+                    let offsetH = div.offsetHeight;
+                    let clientW = div.clientWidth;
+                    let clientH = div.clientHeight;
+                    div.remove();
+                    return {
+                        scrollWidth: offsetW - clientW,
+                        scrollHeight: offsetH - clientH,
+                    }
+                };
+                /*
+                * 未解决的问题:
+                * 1. 在改变浏览器宽的时候, 小盒子的宽度会为NaN
+                * 2. 在没有出现滚条时, 浏览器右边缘会又一个空隙
+                * 3. 在浏览器窗口宽度改变时候会重新执行for循环, 我需要的是改变盒子的大小, 而不是重新生成一些新的盒子,那样性能不是很好
+                * 4. top没有完成, 目前就只写了left, 就这个都还差点
+                * 5. 有时间来想一想怎么写, 不要一股脑的一直停留在这里
+                * 6. 不管写没写好, 记得同步到GitHub
+                *
+                * */
+                let {scrollWidth} = getScroll();
+                let createDom = function(dom, obj , len, w, show, index) {
+                    console.log(w);
+                    let width = Math.floor(w / show);
+                    console.log(width);
                     let addW = 0;
+                    let t = 0;
+                    // scrollWidth = 0;
                     for (let i = 0; i < len; i++) {
-                        let cache = Math.floor(Math.random()*500);
-                        let h = cache > 99? cache : cache * 5;
+                        let cache = Math.floor(Math.random() * 500);
+                        let h = cache > 99 ? cache : (cache + 10) * 5;
                         let newDom = document.createElement(dom);
+                        if (addW + width + scrollWidth > w){
+                            console.log(scrollWidth);
+                            width = w - addW - scrollWidth;
+                        }
                         if (dom === 'img') {
                             dom.src = `./images/${index}.jpg`;
                         } else {
                             newDom.classList.add('child');
-                            newDom.style.cssText = `position: absolute;left: ${addW}px;width: ${w}px;height: ${h}px;background: #eee;`
+                            newDom.style.cssText = `position: absolute;left: ${addW}px;width: ${width}px;height: ${h}px;background: #eee;`
                         }
                         obj.appendChild(newDom);
-                        addW += w + 2;
-                        if (addW - width > )
-                    }
+                        if (addW + width > w - width) {
+                            addW = 0;
+                            width = Math.floor(w / show);
+                        } else {
+                            addW += width;
+                        }
+                    };
                 };
                 let app = document.getElementById("app");
                 let w = app.offsetWidth;
-                createDom('div', app, 100, w, 10);
-                this.onresize = () => {
+                createDom('div', app, 11, w, 10);
+                window.onresize = () => {
                     w = app.offsetWidth;
                     createDom('div', app, 100, w);
                 }
-            }
+            };
+            /*console.time('运行时间');
+            if ( 100 > 0 && 100 > 19 && 20 > 0 && 21 > 19 && 23 > 0 && 100 > 0 && 100 > 19 && 20 > 0 && 21 > 19 && 23 > 0) {
+                console.timeEnd('运行时间');// 0.004150390625ms
+            }*/
+            /*console.time('运行时间');
+            if ( 100 > 1-1 && 100 > 20-1 && 20 > 1-1 && 21 > 20-1 && 23 > 1-1 && 100 > 1-1 && 100 > 20-1 && 20 > 1-1 && 21 > 20-1 && 23 > 1-1) {
+                console.timeEnd('运行时间');// 0.006103515625ms
+            }*/
+            /*console.time('运行时间');
+            if ( 100 >= 1 && 100 >= 20 && 20 >= 1 && 21 >= 20 && 23 >= 1 && 100 >= 1 && 100 >= 20 && 20 >= 1 && 21 >= 20 && 23 >= 1) {
+                console.timeEnd('运行时间');// 0.013916015625ms
+            }*/
         </script>
     </body>
 </html>
