@@ -15,9 +15,14 @@
             #app{
                 position: relative;
                 width: 100%;
+                box-sizing: border-box;
             }
             #app image{
                 float: left;
+            }
+            #app .child{
+                box-sizing: border-box;
+                text-align: center;
             }
         </style>
     </head>
@@ -51,7 +56,7 @@
                 /*
                 * 未解决的问题:
                 * 1. 在改变浏览器宽的时候, 小盒子的宽度会为NaN
-                * 2. 在没有出现滚条时, 浏览器右边缘会又一个空隙
+                * 2. 在没有出现滚条时, 浏览器右边缘会有一个空隙
                 * 3. 在浏览器窗口宽度改变时候会重新执行for循环, 我需要的是改变盒子的大小, 而不是重新生成一些新的盒子,那样性能不是很好
                 * 4. top没有完成, 目前就只写了left, 就这个都还差点
                 * 5. 有时间来想一想怎么写, 不要一股脑的一直停留在这里
@@ -60,30 +65,42 @@
                 * */
                 let {scrollWidth} = getScroll();
                 let createDom = function(dom, obj , len, w, show, index) {
-                    console.log(w);
                     let width = Math.floor(w / show);
-                    console.log(width);
                     let addW = 0;
-                    let t = 0;
+                    let top = 0;
+                    let isWrap = false;
+                    let arrHeight = [];
+                    let num = 0;
                     // scrollWidth = 0;
                     for (let i = 0; i < len; i++) {
                         let cache = Math.floor(Math.random() * 500);
                         let h = cache > 99 ? cache : (cache + 10) * 5;
                         let newDom = document.createElement(dom);
                         if (addW + width + scrollWidth > w){
-                            console.log(scrollWidth);
                             width = w - addW - scrollWidth;
+                        }
+                        if (isWrap) {
+                            top = arrHeight[num];
+                            arrHeight[num] = h + top + 5;
+                            num++;
+                        } else {
+                            arrHeight.push(h+5);
+                            top = 0;
                         }
                         if (dom === 'img') {
                             dom.src = `./images/${index}.jpg`;
                         } else {
+                            newDom.innerHTML = i;
                             newDom.classList.add('child');
-                            newDom.style.cssText = `position: absolute;left: ${addW}px;width: ${width}px;height: ${h}px;background: #eee;`
+                            // console.log(top);
+                            newDom.style.cssText = `position: absolute;left: ${addW}px;top: ${top}px;width: ${width-5}px;height: ${h}px;background: #eee;line-height: ${h}px;font-size: ${width/2}px;`
                         }
                         obj.appendChild(newDom);
                         if (addW + width > w - width) {
                             addW = 0;
+                            isWrap = true;
                             width = Math.floor(w / show);
+                            num = 0;
                         } else {
                             addW += width;
                         }
@@ -91,10 +108,9 @@
                 };
                 let app = document.getElementById("app");
                 let w = app.offsetWidth;
-                createDom('div', app, 11, w, 10);
-                window.onresize = () => {
+                createDom('div', app, 100, w, 10);
+                window.onresize = function() {
                     w = app.offsetWidth;
-                    createDom('div', app, 100, w);
                 }
             };
             /*console.time('运行时间');
