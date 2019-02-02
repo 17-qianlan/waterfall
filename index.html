@@ -15,7 +15,8 @@
             #app{
                 position: relative;
                 width: 100%;
-                box-sizing: border-box;
+                height: 100%;
+                /*box-sizing: border-box;*/
             }
             #app image{
                 float: left;
@@ -65,66 +66,61 @@
                 * */
                 let {scrollWidth} = getScroll();
                 let createDom = function(dom, obj , len, w, show, index) {
-                    let width = Math.floor(w / show);
-                    let addW = 0;
+                    let width = (w-(show*5))/show;
+                    console.log(width);
                     let top = 0;
+                    let left = 0;
                     let isWrap = false;
-                    let arrHeight = [];
+                    let arrTop = [];
+                    let arrLeft = [];
                     let num = 0;
+                    let fragment = document.createDocumentFragment();
+                    let length = show;
+                    show = show-1;
                     // scrollWidth = 0;
+                    console.time('for');
                     for (let i = 0; i < len; i++) {
                         let cache = Math.floor(Math.random() * 500);
                         let h = cache > 99 ? cache : (cache + 10) * 5;
+                        h = 100;
                         let newDom = document.createElement(dom);
-                        if (addW + width + scrollWidth > w){
-                            width = w - addW - scrollWidth;
-                        }
                         if (isWrap) {
-                            top = arrHeight[num];
-                            arrHeight[num] = h + top + 5;
+                            top = arrTop[i%length];
+                            arrTop[i%length] = h + top + 5;
                             num++;
                         } else {
-                            arrHeight.push(h+5);
+                            arrTop.push(h+5);
                             top = 0;
                         }
+                        left = arrLeft[(i%length)- 1] || 0;
+                        arrLeft[i%length] = width + left + 5;
                         if (dom === 'img') {
                             dom.src = `./images/${index}.jpg`;
                         } else {
                             newDom.innerHTML = i;
                             newDom.classList.add('child');
                             // console.log(top);
-                            newDom.style.cssText = `position: absolute;left: ${addW}px;top: ${top}px;width: ${width-5}px;height: ${h}px;background: #eee;line-height: ${h}px;font-size: ${width/2}px;`
+                            newDom.style.cssText = `position: absolute;left: ${left}px;top: ${top}px;width: ${width-5}px;height: ${h}px;background: #eee;line-height: ${h}px;font-size: ${width/2}px;`
                         }
-                        obj.appendChild(newDom);
-                        if (addW + width > w - width) {
-                            addW = 0;
+                        // obj.appendChild(newDom);
+                        fragment.appendChild(newDom);
+                        if (!(i%show)) {
                             isWrap = true;
-                            width = Math.floor(w / show);
                             num = 0;
-                        } else {
-                            addW += width;
                         }
                     };
+                    obj.appendChild(fragment);
+                    console.timeEnd('for');// 4.239990234375ms
                 };
                 let app = document.getElementById("app");
                 let w = app.offsetWidth;
-                createDom('div', app, 100, w, 10);
+                createDom('div', app, 11, w, 10);
                 window.onresize = function() {
                     w = app.offsetWidth;
+                    app.innerHTML = '';
+                    createDom('div', app, 10, w, 10);
                 }
             };
-            /*console.time('运行时间');
-            if ( 100 > 0 && 100 > 19 && 20 > 0 && 21 > 19 && 23 > 0 && 100 > 0 && 100 > 19 && 20 > 0 && 21 > 19 && 23 > 0) {
-                console.timeEnd('运行时间');// 0.004150390625ms
-            }*/
-            /*console.time('运行时间');
-            if ( 100 > 1-1 && 100 > 20-1 && 20 > 1-1 && 21 > 20-1 && 23 > 1-1 && 100 > 1-1 && 100 > 20-1 && 20 > 1-1 && 21 > 20-1 && 23 > 1-1) {
-                console.timeEnd('运行时间');// 0.006103515625ms
-            }*/
-            /*console.time('运行时间');
-            if ( 100 >= 1 && 100 >= 20 && 20 >= 1 && 21 >= 20 && 23 >= 1 && 100 >= 1 && 100 >= 20 && 20 >= 1 && 21 >= 20 && 23 >= 1) {
-                console.timeEnd('运行时间');// 0.013916015625ms
-            }*/
         </script>
     </body>
 </html>
